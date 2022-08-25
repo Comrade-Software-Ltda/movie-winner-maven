@@ -1,0 +1,1 @@
+insert into movi_movie values( 30, 'SALES', 'CHICAGO','SALES', 'CHICAGO','SALES');
