@@ -41,7 +41,7 @@ public class MovieController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "List all Movies",
             tags = {"Movie"})
-    public ListResultDto<MovieDto> getAll(@RequestParam("pageNumber") Optional<Integer> pageNumber, @RequestParam("pageSize")Optional<Integer> pageSize) {
+    public ListResultDto<MovieDto> getAll(@RequestParam("pageNumber") Optional<Integer> pageNumber, @RequestParam("pageSize") Optional<Integer> pageSize) {
         try {
             return _movieQuery.findAll();
         } catch (Exception ex) {
@@ -65,7 +65,7 @@ public class MovieController {
     @Operation(tags = {"Movie"})
     public SingleResultDto<MovieDto> save(@RequestBody MovieDto movie) {
         try {
-            var result =  _movieCommand.save(movie);
+            var result = _movieCommand.save(movie);
             return new SingleResultDto<>(result);
         } catch (Exception ex) {
             return new SingleResultDto<>(ex);
@@ -77,7 +77,7 @@ public class MovieController {
     @Operation(tags = {"Movie"})
     public SingleResultDto<MovieDto> saveBatch(@RequestBody List<MovieDto> movies) {
         try {
-            var result =  _movieCommand.saveBatch(movies);
+            var result = _movieCommand.saveBatch(movies);
             return new SingleResultDto<>(result);
         } catch (Exception ex) {
             return new SingleResultDto<>(ex);
@@ -90,8 +90,12 @@ public class MovieController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(tags = {"Movie"})
     public ResultDto handleUpload(@RequestPart("file") MultipartFile file) throws IOException {
-        var result = _movieCommand.processFile(file);
-        return result;
+        try {
+            var result = _movieCommand.processFile(file);
+            return result;
+        } catch (Exception ex) {
+            return new ResultDto();
+        }
     }
 
     @PutMapping("update")
@@ -99,7 +103,7 @@ public class MovieController {
     @Operation(tags = {"Movie"})
     public SingleResultDto<MovieDto> update(@RequestBody MovieDto movie) {
         try {
-            var result =  _movieCommand.update(movie);
+            var result = _movieCommand.update(movie);
             return new SingleResultDto<>(result);
         } catch (Exception ex) {
             return new SingleResultDto<>(ex);

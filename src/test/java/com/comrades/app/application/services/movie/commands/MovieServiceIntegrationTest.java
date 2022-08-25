@@ -1,12 +1,17 @@
 package com.comrades.app.application.services.movie.commands;
 
 import com.comrades.app.application.services.movie.IMovieCommand;
+import com.comrades.app.application.services.movie.dtos.MovieDto;
 import com.comrades.app.core.bases.UseCaseFacade;
 import com.comrades.app.persistence.repositories.MovieRepository;
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +46,7 @@ public class MovieServiceIntegrationTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Before
+    @BeforeAll
     public void setup() throws Exception {
         openMocks(this);
 
@@ -67,8 +72,99 @@ public class MovieServiceIntegrationTest {
         Assert.assertNotNull(response.getMin().get(0));
         Assert.assertNotNull(response.getMin().get(1));
         Assert.assertNotNull(response.getMax());
-        Assert.assertEquals(response.getMin().get(0).getProducer(), "Joel Silver");
-        Assert.assertEquals(response.getMin().get(1).getProducer(), "Joel Silver");
+        Assert.assertEquals("Joel Silver", response.getMin().get(0).getProducer());
+        Assert.assertEquals("Joel Silver", response.getMin().get(1).getProducer());
+
+    }
+
+
+    @Test
+    public void testCheckDataFromFile() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("file", "hello.csv",
+                MediaType.TEXT_PLAIN_VALUE, new FileInputStream(new File("src/main/resources/movielist.csv")));
+
+        CsvMapper csvMapper = new CsvMapper();
+        CsvSchema csvSchema = csvMapper
+                .schemaFor(MovieDto.class)
+                .withColumnSeparator(';')
+                .withHeader();
+
+        MappingIterator<MovieDto> orderLines = csvMapper.readerFor(MovieDto.class)
+                .with(csvSchema)
+                .readValues(file.getInputStream());
+
+        var response = orderLines.readAll();
+
+        Assert.assertNotNull(response);
+        Assert.assertEquals(206, response.size());
+    }
+
+    @Test
+    public void testCheckDataFromFileEmpty() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("file", "hello.csv",
+                MediaType.TEXT_PLAIN_VALUE, new FileInputStream(new File("src/main/resources/movielist-empty.csv")));
+
+        CsvMapper csvMapper = new CsvMapper();
+        CsvSchema csvSchema = csvMapper
+                .schemaFor(MovieDto.class)
+                .withColumnSeparator(';')
+                .withHeader();
+
+        MappingIterator<MovieDto> orderLines = csvMapper.readerFor(MovieDto.class)
+                .with(csvSchema)
+                .readValues(file.getInputStream());
+
+        var response = orderLines.readAll();
+
+        Assert.assertNotNull(response);
+        Assert.assertEquals(0, response.size());
+    }
+
+    @Test
+    public void testCheckDataFromFileHeaderError() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("file", "hello.csv",
+                MediaType.TEXT_PLAIN_VALUE, new FileInputStream(new File("src/main/resources/movielist-header-error.csv")));
+
+        CsvMapper csvMapper = new CsvMapper();
+        CsvSchema csvSchema = csvMapper
+                .schemaFor(MovieDto.class)
+                .withColumnSeparator(';')
+                .withHeader();
+
+        MappingIterator<MovieDto> orderLines = csvMapper.readerFor(MovieDto.class)
+                .with(csvSchema)
+                .readValues(file.getInputStream());
+
+        var response = orderLines.readAll();
+
+        Assert.assertNotNull(response);
+        Assert.assertEquals(206, response.size());
+
+    }
+
+    @Test
+    public void testCheckDataFromFileContentError() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("file", "hello.csv",
+                MediaType.TEXT_PLAIN_VALUE, new FileInputStream(new File("src/main/resources/movielist-content-error.csv")));
+
+        try {
+            CsvMapper csvMapper = new CsvMapper();
+            CsvSchema csvSchema = csvMapper
+                    .schemaFor(MovieDto.class)
+                    .withColumnSeparator(';')
+                    .withHeader();
+
+            MappingIterator<MovieDto> orderLines = csvMapper.readerFor(MovieDto.class)
+                    .with(csvSchema)
+                    .readValues(file.getInputStream());
+
+            var response = orderLines.readAll();
+
+            Assert.assertNotNull(response);
+            Assert.assertEquals(206, response.size());
+        } catch (Exception ex) {
+            Assert.assertNotNull(ex);
+        }
 
     }
 

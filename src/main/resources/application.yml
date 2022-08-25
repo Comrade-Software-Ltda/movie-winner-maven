@@ -29,7 +29,7 @@ springdoc:
     operationsSorter: method
     disable-swagger-default-url: true
     use-root-path: true
-  show-actuator: true
+  show-actuator: false
   group-configs:
     - group: stores
       paths-to-match: /**

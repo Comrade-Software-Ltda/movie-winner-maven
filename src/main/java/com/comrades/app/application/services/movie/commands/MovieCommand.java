@@ -31,6 +31,7 @@ public class MovieCommand implements IMovieCommand {
     private MovieRepository _movieRepository;
 
     public ResultDto processFile(MultipartFile file) throws IOException {
+
         List<MovieDto> allMovies = getDataFromFile(file);
         saveBatch(allMovies);
 
@@ -38,6 +39,7 @@ public class MovieCommand implements IMovieCommand {
         var response = facade.execute(uc);
 
         return response;
+
     }
 
     public Integer save(MovieDto movie) {

@@ -17,6 +17,14 @@ import java.util.UUID;
 @Table("movi_movie")
 public class Movie {
 
+    public Movie(UUID _id, Integer _year, String _title, String _studios, String _winner){
+        id = _id;
+        year = _year;
+        title = _title;
+        studios = _studios;
+        winner = _winner;
+    }
+
     public Movie(UUID _id, Integer _year, String _title, String _studios, String _producerName, String _winner){
         id = _id;
         year = _year;

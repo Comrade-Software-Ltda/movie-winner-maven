@@ -211,6 +211,6 @@ public class MovieRepository implements IMovieRepository {
                                 HAVING count(prod.prod_tx_name) >= 2
                             )
                                 """;
-        return jdbcTemplate.query(sql, new MovieRowMapper());
+        return jdbcTemplate.query(sql, new MovieCustomRowMapper());
     }
 }
