@@ -57,6 +57,9 @@ public class MovieRepository implements IMovieRepository {
     public int[] saveBatch(List<Movie> movies) {
 
         try {
+            deleteAllProducers();
+            deleteAllMovies();
+
             var sql = """
                     INSERT INTO movi_movie(movi_uuid_movie, movi_nb_year, movi_tx_title, movi_tx_studios,
                     movi_tx_winner)
@@ -88,6 +91,8 @@ public class MovieRepository implements IMovieRepository {
     public int[] saveProducers(List<Producer> producers) {
 
         try {
+
+
             var sql = """
                     INSERT INTO prod_producer(prod_uuid_producer, movi_uuid_movie, prod_tx_name)
                     VALUES (?, ?, ?);
@@ -150,10 +155,23 @@ public class MovieRepository implements IMovieRepository {
     }
 
     @Override
-    public int deleteAll() {
+    public int deleteAllMovies() {
         try {
             var sql = """
                     DELETE FROM movi_movie
+                    """;
+            return jdbcTemplate.update(sql);
+        } catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            throw ex;
+        }
+    }
+
+    @Override
+    public int deleteAllProducers() {
+        try {
+            var sql = """
+                    DELETE FROM prod_producer
                     """;
             return jdbcTemplate.update(sql);
         } catch (Exception ex) {

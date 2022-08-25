@@ -12,6 +12,7 @@ public interface IMovieRepository {
     int save(Movie movie);
     int edit(Movie movie);
     int delete(UUID id);
-    int deleteAll();
+    int deleteAllMovies();
+    int deleteAllProducers();
     Optional<Movie> findById(UUID id);
 }
